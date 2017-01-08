@@ -51,4 +51,4 @@ score_many <- function(symbols) {
   prize[three] <- payoffs[symbols[three, 3]]
   unname(prize * 2^diamonds)
 }
-system.time(play_many(10000000))
+#system.time(play_many(10000000))
