@@ -5,41 +5,37 @@ get_symbols<- function(){
 
 play<-function(){
   symbols<-get_symbols()
-  structure(score(symbols),symbols=symbols,class="slots")
+  structure(score1(symbols),symbols=symbols,class="slots")
 }
-# #Not Considering DD as WildCards
-# score<-function(symbols) {
-# #identify case
-# same<- symbols[1]==symbols[2] && symbols[2]==symbols[3]
-# bars<-symbols %in% c("B","BB","BBB")
-# 
-# #get prize
-# if(same) {
-#   payouts<-c("DD"=100,"7"=80,"BBB"=40,"BB"=25,"B"=10,"C"=10,"0"=0)
-#   prize<- unname(payouts[symbols[1]])
-# } else if(all(bars)) {
-#   prize<- 5
-# } else {
-#   cherries<-sum(symbols=="C")
-#   prize<- c(0,2,5)[cherries+1]
-# }
-# 
-# #adjust for diamonds
-# diamonds<-sum(symbols=="DD")
-# prize*2^diamonds
-# }
+#Not Considering DD as WildCards
+score<-function(symbols) {
+#identify case
+same<- symbols[1]==symbols[2] && symbols[2]==symbols[3]
+bars<-symbols %in% c("B","BB","BBB")
+
+#get prize
+if(same) {
+  payouts<-c("DD"=100,"7"=80,"BBB"=40,"BB"=25,"B"=10,"C"=10,"0"=0)
+  prize<- unname(payouts[symbols[1]])
+} else if(all(bars)) {
+  prize<- 5
+} else {
+  cherries<-sum(symbols=="C")
+  prize<- c(0,2,5)[cherries+1]
+}
+
+#adjust for diamonds
+diamonds<-sum(symbols=="DD")
+prize*2^diamonds
+}
 
 #Considering DD as Wildcards
-score <- function(symbols) {
+score1 <- function(symbols) {
   diamonds <- sum(symbols == "DD")
   cherries <- sum(symbols == "C")
-  # identify case
-  # since diamonds are wild, only nondiamonds
-  # matter for three of a kind and all bars
   slots <- symbols[symbols != "DD"]
   same <- length(unique(slots)) == 1
   bars <- slots %in% c("B", "BB", "BBB")
-  # assign prize
   if (diamonds == 3) {
     prize <- 100
   } else if (same) {
@@ -49,13 +45,10 @@ score <- function(symbols) {
   } else if (all(bars)) {
     prize <- 5
   } else if (cherries > 0) {
-    # diamonds count as cherries
-    # so long as there is one real cherry
     prize <- c(0, 2, 5)[cherries + diamonds + 1]
   } else {
     prize <- 0
   }
-  # double for each diamond
   prize * 2^diamonds
 }
 slot_display<- function(prize) {

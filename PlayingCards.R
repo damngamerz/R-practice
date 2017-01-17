@@ -31,9 +31,9 @@ deck3$value[deck3$face=="ace"]<-14
 #Hearts
 deck4<-deck
 deck4$value<-0
-deck4$vaule[deck4$suit=="hearts"]<-1
-queenOfSpades<-deck4$face=="queen"& deck4$suit=="spades"
-deck4[queenOfSpades,]<-13
+deck4$value[deck4$suit=="hearts"]<-1
+queenOfSpades<-deck4$face=="queen" & deck4$suit=="spades"
+deck4$value[queenOfSpades]<-13
 
 # BlackJack
 deck5<-deck
