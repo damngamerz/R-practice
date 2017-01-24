@@ -1,0 +1,98 @@
+---
+title: "Playing_Cards"
+author: "Saurav Singh"
+date: "17 January 2017"
+output: pdf_document
+---
+
+## Playing Cards
+First I have imported **deck.csv** file which have playing cards data in format:
+
+```{R}
+deck=read.table("deck.csv",sep = ",",header = TRUE,stringsAsFactors = FALSE)
+head(deck,10)
+```
+
+Next, I have setup function which does the following things:
+ 
+ 
+* Saves **deck** to **DECK**,so as to preserve the original copy.
+* Declares DEAL() function which deals the card on the top and removes it from the deck.
+* Declares SHUFFLE() function which shuffles the deck.
+
+
+Finally,setting up the deck accordingly.
+
+```{R}
+setup<-function(deck){
+DECK<-deck
+
+DEAL<-function(){
+  card<-deck[1,]
+  assign("deck",deck[-1,],envir = parent.env(environment()))
+  card
+}
+
+SHUFFLE<-function(){
+  random<-sample(1:52,size=52)
+  assign("deck",DECK[random,],envir = parent.env(environment()))
+}
+
+list(deal=DEAL,shuffle=SHUFFLE)
+}
+cards<-setup(deck)
+deal<-cards$deal
+shuffle<-cards$shuffle
+```
+
+##Game Of War
+Arranging a deck according to Game of War.  
+(i.e giving all Aces a value of 14.)
+```{R}
+deck2<-deck
+deck2$value[c(13,26,39,52)]<-14
+```
+The above can only work if we have the original arranged set of playing cards.  
+If we had shuffled deck then:
+```{R}
+deck3<-shuffle()
+deck3$value[deck3$face=="ace"]<-14
+```
+
+##Hearts
+Arranging a deck according to the Game of Hearts.  
+(i.e setting the value of each suit of hearts as 1, for Queen of Spades the value will be 13 and for rest all the value will be 0.)
+```{R}
+deck4<-deck
+deck4$value<-0
+deck4$value[deck4$suit=="hearts"]<-1
+queenOfSpades<-deck4$face=="queen" & deck4$suit=="spades"
+deck4$value[queenOfSpades]<-13
+```
+##BlackJack
+Arranging a deck according to the Game of BlackJack.
+(i.e setting the value of each facecard as 10 and for aces the value is NA as its value depends on the outcome of the game.)
+```{R}
+deck5<-deck
+facecard<-deck5$face %in% c("king","queen","jack")
+deck5$value[facecard]<-10
+deck5$value[deck5$face=="ace"]<-NA
+```
+
+***
+
+##Environments
+For understanding environments I have used the following function:  
+```{R}
+show_env<-function(){
+  a=15
+  b=6
+  c=4
+  list(ran.in=environment(),
+       parent=parent.env(environment()),
+       objects=ls.str(environment()))
+}
+show_env()
+```
+It shows the reference of the running environment created while calling show_env() function.Also, shows the parent of the environment i.e Global Environment.Lastly, it tells us about how functions behave, as everytime when they are called creates a running environment in which these variable a,b,c are with-held.  
+Understanding environments was important because of which I was able to create SHUFFLE() and DEAL() function.
