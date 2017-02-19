@@ -1,0 +1,53 @@
+---
+title: "Snake_and_Ladders"
+author: "Saurav Singh"
+date: "19 February 2017"
+output: pdf_document
+---
+
+## Snake & Ladders Solution
+```{r}
+# Snakes and ladders Simulation
+```{r}
+library("ggplot2")
+ladder.df <- data.frame(start=c(3,11), end=c(13,17))
+slide.df <- data.frame(start=c(10,16,18), end=c(5,2,8))
+#out <- for (i in c(1:num.iter)) {
+out <-function()
+{
+curLoc <- 0 # Current location
+nroll <- 0 # Number of rolls
+slides <- 0 # Number of slides encountered
+ladders <- 0 # Number of ladders encountered
+
+# Keep rolling dice and moving until reach 100 or greater ending the game
+while(curLoc < 20) {
+  roll <- sample(6,size = 1,replace = TRUE,prob = c(1/6,1/6,1/6,1/6,1/6,1/6)) # generate random number between [1 to 6]
+  curLoc <- curLoc + roll # increase position
+  nroll <- nroll + 1 # increase number of rolls
+  # Need to check if we landed on a ladder or slide and move forward or back
+  if (any(ladder.df$s %in% curLoc)) {
+    curLoc <- ladder.df$e[ladder.df$s %in% curLoc]
+    ladders <- ladders + 1
+  }
+  if (any(slide.df$s %in% curLoc)) {
+    curLoc <- slide.df$e[slide.df$s %in% curLoc]
+    slides <- slides + 1
+  }
+  out.info <- list(No_of_rolls=nroll, No_of_ladder=ladders, No_of_snakes=slides)
+  
+  
+}
+return (nroll)
+}
+# Expectation of N
+plays<-replicate(1000,out())
+mean(plays)
+freq<-table(plays)
+freq
+percent<-freq/10
+percent
+frq = as.data.frame(percent)
+frq
+plot(frq)
+```
