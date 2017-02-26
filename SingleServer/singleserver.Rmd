@@ -1,0 +1,50 @@
+---
+title: "singleserver"
+author: "Saurav Singh"
+date: "26 February 2017"
+output: pdf_document
+---
+
+#Single Server Queuing Model.
+
+The function queue is as follows:  
+q -> average interarrival time  
+a -> average service time  
+numarrivals -> number of persons entering the queue.
+```{r}
+
+queue <- function(a, p, numarrivals) {
+  
+  wait_time  <- 0;          
+  total_wait_time <- 0;     
+  total_idle_time <- 0;     
+  total_arrival_time <- 0;  
+  for (i in 1:numarrivals) {
+    
+    service_time <- rexp(1, 1/p);      
+    interarival_time <- rexp(1, 1/a);  
+    
+    total_arrival_time <- total_arrival_time + interarival_time;  
+    wait_time  <- wait_time - interarival_time + service_time;    
+    if (wait_time >= 0)
+      total_wait_time <- total_wait_time + wait_time    
+    else {
+      total_idle_time <- total_idle_time - wait_time;   
+      wait_time  <- 0;                                  
+    }
+  }
+  
+  result <- data.frame(Utilization=1-total_idle_time/total_arrival_time,
+                       TimeInQueue=total_wait_time/numarrivals,
+                       TimeInSystem=total_wait_time/numarrivals+p,
+                       NumberInQueue=total_wait_time/total_arrival_time,      
+                       NumberInSystem=total_wait_time/total_arrival_time+p/a);
+  return(result)   
+}
+```
+Now,  
+For Arrival Rate=1,Service Rate=.5 and 20 customers enter the queue.  
+The Output Statistics will be as follow.
+```{r}
+queue(1,0.5,20)
+```
