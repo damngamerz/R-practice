@@ -1,0 +1,224 @@
+---
+title: "Assignment_2"
+author: "Saurav Singh"
+date: "28 February 2017"
+output: pdf_document
+---
+
+```{r}
+par(mfrow=c(2,2))
+curve(1 - log(x) * exp(-x^2),0.8,2)  
+```  
+
+
+**1. Unconstrained optimization in one dimension (f(x) =1 - log(x) * exp(-x^2).)**  
+
+**Newton's Method**  
+```{r}
+newton <- function(f, tol=1E-12,x0=1,N=20) {
+  h <- 0.001
+  i <- 1; x1 <- x0
+  p <- numeric(N)
+  while (i<=N) {
+    df.dx <- (f(x0+h)-f(x0))/h
+    x1 <- (x0 - (f(x0)/df.dx))
+    p[i] <- x1
+    i <- i + 1
+    if (abs(x1-x0) < tol) break
+    x0 <- x1
+  }
+  return(p[1:(i-1)])
+}
+f <-function(x) { {4*x^2 + 5 * x^3} }
+p <- newton(f, x0=1, N=10)
+p
+```
+**Golden-Section Search**
+```{r}
+f <- function(x) {1 - log(x) * exp(-x^2)}
+golden.section.search = function(f, a, b, tolerance)
+{
+  golden.ratio = 2/(sqrt(5) + 1)
+  
+  ### Use the golden ratio to set the initial test points
+  x1 = b - golden.ratio*(b - a)
+  x2 = a + golden.ratio*(b - a)
+  
+  ### Evaluate the function at the test points
+  f1 = f(x1)
+  f2 = f(x2)
+  
+  iteration = 0
+  
+  while (abs(b - a) > tolerance)
+  {
+    iteration = iteration + 1
+    cat('', '\n')
+    cat('Iteration #', iteration, '\n')
+    cat('f1 =', f1, '\n')
+    cat('f2 =', f2, '\n')
+    
+    if (f2 > f1)
+      # then the minimum is to the left of x2
+      # let x2 be the new upper bound
+      # let x1 be the new upper test point
+    {
+      cat('f2 > f1', '\n')
+      ### Set the new upper bound
+      b = x2
+      cat('New Upper Bound =', b, '\n')
+      cat('New Lower Bound =', a, '\n')
+      ### Set the new upper test point
+      ### Use the special result of the golden ratio
+      x2 = x1
+      cat('New Upper Test Point = ', x2, '\n')
+      f2 = f1
+      
+      ### Set the new lower test point
+      x1 = b - golden.ratio*(b - a)
+      cat('New Lower Test Point = ', x1, '\n')
+      f1 = f(x1)
+    } 
+    else 
+    {
+      cat('f2 < f1', '\n')
+      # the minimum is to the right of x1
+      # let x1 be the new lower bound
+      # let x2 be the new lower test point
+      
+      ### Set the new lower bound
+      a = x1
+      cat('New Upper Bound =', b, '\n')
+      cat('New Lower Bound =', a, '\n')
+      
+      ### Set the new lower test point
+      x1 = x2
+      cat('New Lower Test Point = ', x1, '\n')
+      
+      f1 = f2
+      
+      ### Set the new upper test point
+      x2 = a + golden.ratio*(b - a)
+      cat('New Upper Test Point = ', x2, '\n')
+      f2 = f(x2)
+    }
+  }
+  
+  ### Use the mid-point of the final interval as the estimate of the optimzer
+  cat('', '\n')
+  cat('Final Lower Bound =', a, '\n')
+  cat('Final Upper Bound =', b, '\n')
+  estimated.minimizer = (a + b)/2
+  cat('Estimated Minimizer =', estimated.minimizer, '\n')
+}
+golden.section.search(f,0,3,0.0000001)
+```  
+*Unconstrained optimization in multiple dimensions $(f(x1, x2) = exp(0.1 * ((x2 - x1^2))^2 + 0.05*(1 - x1)^2)$ using starting point x(0) = [-0.3, 0.8] and the default tolerance for the convergence test 10-6.)* 
+
+**Steepest Descent Method**  
+```{r}
+library("pracma")
+dummy <- function(x)
+{
+  z <- x[1]
+  y <- x[2]
+  rez <- exp(0.1 * ((y - z^2))^2 + 0.05*(1 - z)^2)
+  rez
+}
+n <- 0          
+eps <- 1        
+a <- 0.09       
+x <- c(-0.3,0.8)  
+#Computation loop 
+while (eps > 1e-10  && n<100)
+{
+gradf <- grad(dummy,x)   
+eps <- abs(gradf)+abs(gradf)                                              
+y <- x- a * gradf                                                                      
+x <- y                                                                              
+n <- n+1                                                                            
+} 
+#display end values
+print(n)
+print(x)
+print(eps)
+
+```
+
+**Newton Method for Unconstrained optimisation in n dimension**
+```{r}
+library("pracma")
+dummy <- function(x)
+{
+  z <- x[1]
+  y <- x[2]
+  rez <- exp(0.1 * ((y - z^2))^2 + 0.05*(1 - z)^2)
+  rez
+}
+n <- 0                  
+eps <- 1                
+x <- c(1,1)           
+
+#Computation loop 
+while (eps>1e-10 && n<100 )
+{
+  gradf <- grad(dummy , x )                                                      
+  eps <- abs(gradf)+abs(gradf)                                                   
+  Hf <- hessian(dummy,x)
+  k <- solve(Hf,-gradf) 
+  y <- x + k
+  x <- y                                                                         
+  n <- n+1                                                                        
+}
+print(n)
+print(x)
+
+```
+**Quasi-Newton for unconstrained optimisation in n dimension**
+```{r}
+library("pracma")
+dummy <- function(x)
+{
+  z <- x[1]
+  y <- x[2]
+  rez <- exp(0.1 * ((y - z^2))^2 + 0.05*(1 - z)^2)
+  rez
+}
+x <- c(-0.3,0.8) 
+a <- 0.09
+B0 <- hessian(dummy, x)
+while (eps>1e-10 && n<100 )
+{
+  grad1 <- grad(dummy,x)
+  eps <- abs(grad1)+abs(grad1)                                                   
+  Bk <- hessian(dummy,y)
+  p <- solve(Bk, -grad1)
+  s <- a * p
+  y <-  x + s
+  x <- y
+  grad2 <- grad(dummy, y)
+  yk <- grad2 - grad1
+  ykt <- transpose(yk)
+  Bk1 <- (Bk + (yk * ykt)/(ykt * s) - (Bk * s)* transpose((Bk * s))/(transpose(s) * Bk* s))
+  n <- n+1
+}
+print(n)
+print(y)
+```
+
+**Direct search methods (Nelder-Mead simplex direct search) $(f(x1, x2) = ((x1^2+x2-11)^2 +((x1+x2^2-7)^2)$ using starting point x(0) = [0,-2].**
+```{r}
+ library("neldermead")
+banana <- function(x){
+  z <- x[1]
+  y <- x[2]
+  rez <- exp(0.1 * ((y - z^2))^2 + 0.05*(1 - z)^2)
+  rez
+}
+opt <- optimset(MaxIter=10)
+sol <- fminsearch(banana, c(0,-2), opt)
+# Final Answer
+sol
+```
+
+
